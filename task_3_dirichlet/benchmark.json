@@ -1,0 +1,86 @@
+{
+  "platform": "Windows-11-10.0.26300-SP0",
+  "block_size": 16,
+  "tolerance": 1e-08,
+  "boundary_temperature": 20,
+  "measurements": [
+    {
+      "nodes_per_side": 65,
+      "threads": 1,
+      "sweeps": 4018,
+      "solve_seconds": [
+        0.058,
+        0.063,
+        0.058
+      ],
+      "median_seconds": 0.058,
+      "speedup": 1.0,
+      "efficiency_percent": 100.0
+    },
+    {
+      "nodes_per_side": 65,
+      "threads": 2,
+      "sweeps": 4018,
+      "solve_seconds": [
+        0.423,
+        0.431,
+        0.427
+      ],
+      "median_seconds": 0.427,
+      "speedup": 0.1358313817330211,
+      "efficiency_percent": 6.791569086651054
+    },
+    {
+      "nodes_per_side": 65,
+      "threads": 4,
+      "sweeps": 4018,
+      "solve_seconds": [
+        0.751,
+        0.757,
+        0.744
+      ],
+      "median_seconds": 0.751,
+      "speedup": 0.07723035952063916,
+      "efficiency_percent": 1.9307589880159788
+    },
+    {
+      "nodes_per_side": 129,
+      "threads": 1,
+      "sweeps": 13773,
+      "solve_seconds": [
+        0.652,
+        0.658,
+        0.655
+      ],
+      "median_seconds": 0.655,
+      "speedup": 1.0,
+      "efficiency_percent": 100.0
+    },
+    {
+      "nodes_per_side": 129,
+      "threads": 2,
+      "sweeps": 13773,
+      "solve_seconds": [
+        3.097,
+        3.083,
+        3.134
+      ],
+      "median_seconds": 3.097,
+      "speedup": 0.21149499515660317,
+      "efficiency_percent": 10.574749757830158
+    },
+    {
+      "nodes_per_side": 129,
+      "threads": 4,
+      "sweeps": 13773,
+      "solve_seconds": [
+        5.155,
+        5.033,
+        4.965
+      ],
+      "median_seconds": 5.033,
+      "speedup": 0.13014106894496325,
+      "efficiency_percent": 3.253526723624081
+    }
+  ]
+}

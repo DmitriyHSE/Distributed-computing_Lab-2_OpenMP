@@ -2,6 +2,7 @@
 
 import hashlib
 import io
+import json
 import os
 from pathlib import Path
 import platform
@@ -49,20 +50,41 @@ def benchmark(nodes):
     if field.shape != exact.shape or not np.allclose(field, exact, atol=5e-5, rtol=0):
         raise ValueError(f"Analytical check failed: max error {error:g}")
     times = [median(samples[p]) for p in THREADS]
+    results = []
     for p, seconds in zip(THREADS, times):
         speedup = times[0] / seconds
+        results.append({
+            "nodes_per_side": nodes,
+            "threads": p,
+            "sweeps": int(reference[1]),
+            "solve_seconds": samples[p],
+            "median_seconds": seconds,
+            "speedup": speedup,
+            "efficiency_percent": 100 * speedup / p,
+        })
         print(f"{nodes:5} {p:7} {seconds:9.4f} {speedup:8.2f} {100*speedup/p:10.1f}")
-    return field, times, error
+    return field, results, error
 
 
 def main():
     fig, (plate, chart) = plt.subplots(1, 2, figsize=(11, 5.6))
     fig.subplots_adjust(top=.79, bottom=.23, left=.07, right=.97, wspace=.36)
     print("nodes threads  median_s  speedup efficiency_%", flush=True)
+    measurements = []
     for nodes in (65, 129):
-        field, times, error = benchmark(nodes)
-        chart.plot(THREADS, times[0] / np.array(times), marker="o", linewidth=2,
+        field, results, error = benchmark(nodes)
+        measurements.extend(results)
+        chart.plot(THREADS, [r["speedup"] for r in results], marker="o", linewidth=2,
                    label=f"{nodes} × {nodes}")
+    report = {
+        "platform": platform.platform(),
+        "block_size": BLOCK,
+        "tolerance": TOLERANCE,
+        "boundary_temperature": BOUNDARY,
+        "measurements": measurements,
+    }
+    (DIRECTORY / "benchmark.json").write_text(json.dumps(report, indent=2) + "\n",
+                                               encoding="utf-8")
     mesh = plate.imshow(field, origin="lower", extent=(0, 1, 0, 1), cmap="inferno")
     fig.colorbar(mesh, ax=plate, format="%.3f", shrink=.85)
     plate.set(xlabel="x", ylabel="y", title=f"Температура · {nodes} × {nodes}")
