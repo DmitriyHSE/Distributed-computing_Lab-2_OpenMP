@@ -35,10 +35,8 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Usage: %s N [threads]\n", argv[0]);
         return 1;
     }
-
     long long N = atoll(argv[1]);
     int threads = (argc >= 3) ? atoi(argv[2]) : omp_get_max_threads();
-
     if (N <= 0) {
         fprintf(stderr, "N must be positive\n");
         return 1;
@@ -46,26 +44,19 @@ int main(int argc, char **argv) {
     if (threads <= 0) {
         threads = omp_get_max_threads();
     }
-
     double inside = 0.0;
-
     double t0 = omp_get_wtime();
-
     #pragma omp parallel num_threads(threads) reduction(+:inside)
     {
         int tid = omp_get_thread_num();
         int nt  = omp_get_num_threads();
-
         uint64_t seed = 0x123456789abcdef0ULL ^ (0x9e3779b97f4a7c15ULL * (uint64_t)(tid + 1));
         XorShift64Star rng;
         rng_init(&rng, seed);
-
         long long chunk = N / nt;
         long long begin = (long long)tid * chunk;
         long long end   = (tid == nt - 1) ? N : begin + chunk;
-
         long long local_inside = 0;
-
         for (long long i = begin; i < end; ++i) {
             double x = rng_uniformPM1(&rng);
             double y = rng_uniformPM1(&rng);
@@ -73,18 +64,12 @@ int main(int argc, char **argv) {
                 ++local_inside;
             }
         }
-
         inside += (double)local_inside;
     }
-
     double t1 = omp_get_wtime();
-
     long long inside_ll = (long long)inside;
     double pi    = 4.0 * inside / (double)N;
     double error = fabs(pi - 3.14159265358979323846);
-
-    printf("N=%lld threads=%d inside=%lld pi=%.10f error=%.6e time=%.6f s\n",
-           N, threads, inside_ll, pi, error, t1 - t0);
-
+    printf("N=%lld threads=%d inside=%lld pi=%.10f error=%.6e time=%.6f s\n", N, threads, inside_ll, pi, error, t1 - t0);
     return 0;
 }
